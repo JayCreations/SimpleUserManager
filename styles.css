@@ -1,0 +1,121 @@
+*
+{
+	margin: 0;
+	padding: 0;
+}
+
+#header
+{
+	background-color: #ccc;
+	padding: 10px 20px;
+	font-style: italic;
+	border-bottom: 1px solid #708090;
+	color: #3B444B;
+}
+
+.form
+{
+	margin: 10px auto 10px auto;
+	background-color: #F9F9F9;
+	padding: 10px;
+	width: 50%;
+	border: 1px solid #AAAAAA;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+
+.form p
+{
+	padding: 5px 0px;
+}
+
+.form label
+{
+	display: block;
+	float: left;
+	width: 150px;
+}
+
+.form p
+{
+	clear: both;
+}
+
+h3
+{
+	border-bottom: 1px dotted #cccccc;
+	margin-bottom: 5px;
+}
+
+.right
+{
+	float: right;
+}
+
+.clear
+{
+	clear: both;
+}
+
+#message, #logged_in
+{
+	margin: 10px auto 10px auto;
+	padding: 10px;
+	width: 50%;
+	border: 1px solid #AAAAAA;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	background-color: #F9F9F9;
+}
+
+.error
+{
+	color: #9e1111;
+	background-color: #f5e8e8 !important;
+}
+
+.success
+{
+	color: #11a322;
+	background-color: #e8f6e9 !important;
+}
+
+.cursor_text, a
+{
+	text-decoration: underline;
+	cursor: pointer;
+	font-size: 90%;
+	color: #3B444B;
+}
+
+.cursor_text:hover, a:hover
+{
+	text-decoration: none;
+}
+
+.students_table
+{
+	border: 1px solid #7C7C7C;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+}
+
+.students_table td
+{
+	padding: 1px 3px;
+}
+.table_header
+{
+	background-color: #D6D6D6;
+}
+
+.table_odd
+{
+	background-color: #EAEAEA;
+}
+
+.table_even
+{
+	background-color: #F2F2F2;
+}

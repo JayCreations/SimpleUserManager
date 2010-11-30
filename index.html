@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Authenticate</title>
+		<link rel="stylesheet" type="text/css" media="all" href="styles.css" />
+		<script type="text/javascript" src="JAuth.js"></script>
+		<script type="text/javascript" src="load.js"></script>
+	</head>
+	<body>
+		<h1 id="header">Juan's Auth <img src="ajax-loading.gif" alt="Loading..." id="loading" /></h1>
+		<div id="message"></div>
+		<div class="form" id="loginForm">
+			<h3>Login</h3>
+			<p><label for="username">Username:</label> <input type="text" name="username" id="username" autofocus="true" placeholder="Username" /></p>
+			<p><label for="password">Password:</label> <input type="password" name="password" id="password" placeholder="Password" /></p>
+			<p class="right">
+				<input type="button" name="clear" id="clear" value="Clear" />&nbsp;
+				<input type="button" name="login" id="login" value="Login" />
+			</p>
+			<br class="clear" />
+		</div>
+
+		<div class="form" id="registerForm">
+			<h3>Register</h3>
+			<p><label for="reg_username">Username:</label> <input type="text" name="reg_username" id="reg_username" /></p>
+			<p><label for="reg_password">Password:</label> <input type="password" name="reg_password" id="reg_password" /></p>
+			<p><label for="reg_password_confirm">Password Confirm:</label> <input type="password" name="reg_password_confirm" id="reg_password_confirm" /></p>
+			<p><label for="reg_first_name">First Name:</label> <input type="text" name="reg_first_name" id="reg_first_name" /></p>
+			<p><label for="reg_last_name">Last Name:</label> <input type="text" name="reg_last_name" id="reg_last_name" /></p>
+			<p><label for="reg_class">Class:</label> <input type="text" name="reg_class" id="reg_class" /></p>
+			<p class="right">
+				<input type="button" name="clear" id="clear_reg" value="Clear" />&nbsp;
+				<input type="button" name="register" id="register" value="Register" />
+			</p>
+			<br class="clear" />
+		</div>
+
+		<div class="form" id="editUserForm">
+			<h3>Edit User</h3>
+			<p><label for="acc_username">Username:</label> <input type="text" name="acc_username" id="acc_username" disabled="disabled" /></p>
+			<p><label for="acc_password">Password:</label> <input type="password" name="acc_password" id="acc_password" /></p>
+			<p><label for="acc_password_confirm">Password Confirm:</label> <input type="password" name="acc_password_confirm" id="acc_password_confirm" /></p>
+			<p><label for="acc_first_name">First Name:</label> <input type="text" name="acc_first_name" id="acc_first_name" /></p>
+			<p><label for="acc_first_name">Last Name:</label> <input type="text" name="acc_first_name" id="acc_last_name" /></p>
+			<p><label for="acc_class">Class:</label> <input type="text" name="acc_class" id="acc_class" /></p>
+			<p class="right">
+				<input type="button" name="update" id="update" value="Update" />
+			</p>
+			<br class="clear" />
+		</div>
+	</body>
+</html>
