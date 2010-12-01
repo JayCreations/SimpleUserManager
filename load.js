@@ -21,7 +21,7 @@ window.onload = function()
 		var hash = e.target.hash;
 		if (re.test(hash))
 		{
-			var id_user = hash.substring(6);
+			var id_user = parseInt(hash.substring(6));
 			// Let send this to the editUserSetup
 			editUserSetup(id_user);
 
@@ -31,7 +31,7 @@ window.onload = function()
 		var re_delete = /^#delete-(\d+)$/ig;
 		if (re_delete.test(hash))
 		{
-			var id_user = hash.substring(8);
+			var id_user = parseInt(hash.substring(8));
 			// Delete the user.
 			jLib.deleteUser(id_user);
 			displayUsers();
@@ -258,7 +258,7 @@ window.onload = function()
 		jLib.show('loading');
 
 		// Are we editing another user or the current logged in one?
-		if (typeof id_user != 'undefined' && typeof id_user == 'integer')
+		if (typeof id_user != 'undefined' && id_user.constructor == Number)
 			editingUser = jLib.getUserById(id_user);
 		else
 			editingUser = currentUser;
