@@ -1,6 +1,21 @@
+/**
+ * Simple User Manager
+ *
+ * A backend to manage users. This is more like a frame work. The UI aspect is
+ * handled by javascript.
+ *
+ * @package		SimpleUserManager
+ * @version		0.1
+ * @author		Juan "JayCreations" Hernandez
+ * @license		MIT
+ * @copyright		2010 Juan J. Hernandez
+ * @link		https://github.com/JayCreations/SimpleUserManager
+ */
+
 window.onload = function()
 {
-	var jLib = new JAuth();
+	var managerAction = 'Manager.php?action=';
+	var jLib = new JAuth({sManagerAction: managerAction});
 	var currentUser = null;
 	var editingUsername = '';
 
@@ -10,6 +25,50 @@ window.onload = function()
 	jLib.hide('loading');
 	// Disable the login.
 	jLib.getElement('login').setAttribute('disabled', 'disabled');
+
+	// Lets check if the user is logged in.
+	jLib.ajaxGet(managerAction + 'isloggedin', function(response)
+	{
+		var isLoggedIn = eval('(' + response + ')');
+
+		jLib.show('loading');
+
+		if (isLoggedIn)
+		{
+			// Get the logged in user.
+			jLib.ajaxGet(managerAction + 'getuser', function(user)
+			{
+				var userInfo = eval('(' + user + ')');
+
+				if (userInfo != false)
+				{
+					// Set the user info.
+					jLib.setUser(userInfo);
+					currentUser = userInfo;
+				}
+			});
+
+			// Get all the users.
+			getUsers();
+
+			// Do the login. But wait a sec first.
+			jLib.sleep(200, doLogin2);
+
+			// Hide.
+			jLib.hide('loading');
+		}
+		else
+			jLib.hide('loading');
+	});
+
+	function getUsers()
+	{
+		jLib.ajaxGet(managerAction + 'getusers', function(users)
+		{
+			users = eval('(' + users + ')');
+			jLib.setUsers(users);
+		});
+	}
 
 	// Lets steal the clicking.
 	jLib.bindOnClickEvent(document, function(e)
@@ -21,7 +80,7 @@ window.onload = function()
 		var hash = e.target.hash;
 		if (re.test(hash))
 		{
-			var id_user = hash.substring(6);
+			var id_user = parseInt(hash.substring(6));
 			// Let send this to the editUserSetup
 			editUserSetup(id_user);
 
@@ -31,7 +90,7 @@ window.onload = function()
 		var re_delete = /^#delete-(\d+)$/ig;
 		if (re_delete.test(hash))
 		{
-			var id_user = hash.substring(8);
+			var id_user = parseInt(hash.substring(8));
 			// Delete the user.
 			jLib.deleteUser(id_user);
 			displayUsers();
@@ -51,7 +110,7 @@ window.onload = function()
 	// Set the clear for the reg form.
 	jLib.bindOnClickEvent('clear_reg', function()
 	{
-		jLib.clearForm(['reg_username', 'reg_password', 'reg_first_name', 'reg_last_name', 'reg_class']);
+		jLib.clearForm(['reg_username', 'reg_password', 'reg_first_name', 'reg_last_name', 'reg_course']);
 	});
 
 	// Lets log in.
@@ -100,19 +159,7 @@ window.onload = function()
 			// After a few seconds we hide and display other info.
 			jLib.sleep(1000, function()
 			{
-				jLib.hide('message');
-				jLib.hide('loginForm');
-				jLib.hide('registerForm');
-				jLib.hide('editUserForm');
-
-				// Get the current user.
-				currentUser = jLib.getUserById(jLib.iCurrentUserId);
-
-				// Display the welcome box.
-				displayWelcomeBox();
-
-				// Display the users.
-				displayUsers();
+				doLogin2();
 
 				// Hide it.
 				jLib.hide('loading');
@@ -129,6 +176,24 @@ window.onload = function()
 		}
 	}
 
+	function doLogin2()
+	{
+		jLib.hide('message');
+		jLib.hide('loginForm');
+		jLib.hide('registerForm');
+		jLib.hide('editUserForm');
+
+		// Get the current user.
+		if (currentUser == null)
+			currentUser = jLib.getUserById(jLib.iCurrentUserId);
+
+		// Display the welcome box.
+		displayWelcomeBox();
+
+		// Display the users.
+		displayUsers();
+	}
+
 	function doRegistration()
 	{
 		var reg_username = document.getElementById('reg_username').value;
@@ -136,7 +201,7 @@ window.onload = function()
 		var reg_password_confirm = document.getElementById('reg_password_confirm').value;
 		var reg_first_name = document.getElementById('reg_first_name').value;
 		var reg_last_name = document.getElementById('reg_last_name').value;
-		var reg_class = document.getElementById('reg_class').value;
+		var reg_course = document.getElementById('reg_course').value;
 
 		// We like subways here. We start fresh.
 		jLib.setInner('message', '');
@@ -164,7 +229,7 @@ window.onload = function()
 		}
 
 		// First and last name needed.
-		if (reg_first_name == '' || reg_last_name == '' || reg_class == '')
+		if (reg_first_name == '' || reg_last_name == '' || reg_course == '')
 		{
 			jLib.setInner('message', 'You must enter a first, last name and class.');
 			jLib.addClass('message', 'error');
@@ -179,7 +244,7 @@ window.onload = function()
 			password: reg_password,
 			first_name: reg_first_name,
 			last_name: reg_last_name,
-			stu_class: reg_class
+			course: reg_course
 		});
 
 		// Did it register?
@@ -198,7 +263,7 @@ window.onload = function()
 		var acc_password_confirm = document.getElementById('acc_password_confirm').value;
 		var acc_first_name = document.getElementById('acc_first_name').value;
 		var acc_last_name = document.getElementById('acc_last_name').value;
-		var acc_class = document.getElementById('acc_class').value;
+		var acc_course = document.getElementById('acc_course').value;
 
 		// Validate the password.
 		if (acc_password != acc_password_confirm || jLib.checkPassword(acc_password) == false)
@@ -212,7 +277,7 @@ window.onload = function()
 		}
 
 		// First and last name needed.
-		if (acc_first_name == '' || acc_last_name == '' || acc_class == '')
+		if (acc_first_name == '' || acc_last_name == '' || acc_course == '')
 		{
 			jLib.setInner('message', 'You must enter a first, last name and class.');
 			jLib.removeClass('message', 'success');
@@ -234,7 +299,7 @@ window.onload = function()
 			password: acc_password,
 			first_name: acc_first_name,
 			last_name: acc_last_name,
-			stu_class: acc_class
+			course: acc_course
 		});
 
 		if (updated == true)
@@ -249,7 +314,7 @@ window.onload = function()
 			// Hide and clear.
 			jLib.hide('editUserForm');
 			jLib.hide('message');
-			jLib.clearForm(['acc_username', 'acc_password', 'acc_first_name', 'acc_last_name', 'acc_class']);
+			jLib.clearForm(['acc_username', 'acc_password', 'acc_first_name', 'acc_last_name', 'acc_course']);
 		}
 	}
 
@@ -258,7 +323,7 @@ window.onload = function()
 		jLib.show('loading');
 
 		// Are we editing another user or the current logged in one?
-		if (typeof id_user != 'undefined' && typeof id_user == 'integer')
+		if (typeof id_user != 'undefined' && id_user.constructor == Number)
 			editingUser = jLib.getUserById(id_user);
 		else
 			editingUser = currentUser;
@@ -269,6 +334,7 @@ window.onload = function()
 		// Just for fun pause it.
 		jLib.sleep(500, function()
 		{
+			// Not logged in?
 			if (currentUser == null)
 				return;
 
@@ -276,11 +342,27 @@ window.onload = function()
 			jLib.getElement('acc_password').value = editingUser.password;
 			jLib.getElement('acc_first_name').value = editingUser.first_name;
 			jLib.getElement('acc_last_name').value = editingUser.last_name;
-			jLib.getElement('acc_class').value = editingUser.stu_class;
+			jLib.getElement('acc_course').value = editingUser.course;
+
+			// Set up the roles.
+			populateRoles(editingUser.role, 'acc_role');
 
 			jLib.show('editUserForm');
 			jLib.hide('loading');
 		});
+	}
+
+	function populateRoles(curRole, field)
+	{
+		var roles = jLib.getRoles();
+		var html = '';
+
+		for (var role in roles)
+		{
+			html += '<option value="' + role + '"' + (curRole == role ? ' selected="selected"' : '') + '>' + roles[role] + '</option>';
+		}
+
+		jLib.setInner(field, html);
 	}
 
 	function logOut()
@@ -306,6 +388,7 @@ window.onload = function()
 			usersBox.innerHTML = '<h3>Users</h3>';
 			usersBox.innerHTML += '<div id="users_list"></div>';
 			// Add it.
+			jLib.getElement('editUserForm').removeAttribute('style');
 			jLib.insertAfter('editUserForm', usersBox);
 		}
 
@@ -314,12 +397,13 @@ window.onload = function()
 			'<tr class="table_header"> <th width="30%">First Name</th> <th width="30%">Last Name</th> <th>Class</th> <th>Action</th> </tr>';
 		// Lets get the users.
 		var users = jLib.getUsers();
+
 		var even = false;
 		for (var i = 0; i < users.length; i++)
 		{
 			if (typeof users[i] != 'undefined')
 			{
-				users_list += '<tr class="' + (even ? 'table_even' : 'table_odd') + '"> <td>' + users[i].first_name + '</td> <td>' + users[i].last_name + '</td> <td>' + users[i].stu_class + '</td> <td><a href="#edit-' + i + '">edit</a> <a href="#delete-' + i + '">delete</a></td> </tr>';
+				users_list += '<tr class="' + (even ? 'table_even' : 'table_odd') + '"> <td>' + users[i].first_name + '</td> <td>' + users[i].last_name + '</td> <td>' + users[i].course + '</td> <td><a href="#edit-' + users[i].id_user + '">edit</a> <a href="#delete-' + users[i].id_user + '">delete</a></td> </tr>';
 			}
 
 			even = !even;

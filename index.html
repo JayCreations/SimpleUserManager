@@ -2,12 +2,12 @@
 <html>
 	<head>
 		<title>Authenticate</title>
-		<link rel="stylesheet" type="text/css" media="all" href="styles.css" />
-		<script type="text/javascript" src="JAuth.js"></script>
-		<script type="text/javascript" src="load.js"></script>
+		<link rel="stylesheet" type="text/css" media="all" href="assets/styles.css" />
+		<script type="text/javascript" src="assets/JAuth.js"></script>
+		<script type="text/javascript" src="assets/load.js"></script>
 	</head>
 	<body>
-		<h1 id="header">Juan's Auth <img src="ajax-loading.gif" alt="Loading..." id="loading" /></h1>
+		<h1 id="header">Juan's Auth <img src="assets/ajax-loading.gif" alt="Loading..." id="loading" /></h1>
 		<div id="message"></div>
 		<div class="form" id="loginForm">
 			<h3>Login</h3>
@@ -27,7 +27,7 @@
 			<p><label for="reg_password_confirm">Password Confirm:</label> <input type="password" name="reg_password_confirm" id="reg_password_confirm" /></p>
 			<p><label for="reg_first_name">First Name:</label> <input type="text" name="reg_first_name" id="reg_first_name" /></p>
 			<p><label for="reg_last_name">Last Name:</label> <input type="text" name="reg_last_name" id="reg_last_name" /></p>
-			<p><label for="reg_class">Class:</label> <input type="text" name="reg_class" id="reg_class" /></p>
+			<p><label for="reg_course">Course:</label> <input type="text" name="reg_course" id="reg_course" /></p>
 			<p class="right">
 				<input type="button" name="clear" id="clear_reg" value="Clear" />&nbsp;
 				<input type="button" name="register" id="register" value="Register" />
@@ -42,7 +42,12 @@
 			<p><label for="acc_password_confirm">Password Confirm:</label> <input type="password" name="acc_password_confirm" id="acc_password_confirm" /></p>
 			<p><label for="acc_first_name">First Name:</label> <input type="text" name="acc_first_name" id="acc_first_name" /></p>
 			<p><label for="acc_first_name">Last Name:</label> <input type="text" name="acc_first_name" id="acc_last_name" /></p>
-			<p><label for="acc_class">Class:</label> <input type="text" name="acc_class" id="acc_class" /></p>
+			<p><label for="acc_dob">Date of Birth:</label> <input type="text" name="acc_dob" id="acc_dob" /></p>
+			<p><label for="acc_course">Course:</label> <input type="text" name="acc_course" id="acc_course" /></p>
+			<p>
+				<label for="acc_role">Role:</label>
+				<select name="acc_role" id="acc_role"></select>
+			</p>
 			<p class="right">
 				<input type="button" name="update" id="update" value="Update" />
 			</p>

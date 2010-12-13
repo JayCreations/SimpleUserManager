@@ -3,7 +3,15 @@ SimpleUserManager 0.1                                                        ???
 
 December 2010
 --------------------------------------------------------------------------------
-!Initial revision.
+! Initial revision.
+! Added copyright header to all files.
++ Created the Database class.
+! Moved js, css, images, to the assets/ folder.
++ Created the Manager class that will handle most of the actions and a few other things.
++ Created the User class that will handle the user management.
+! Report E_STRICT errors.
+! Moved the contructor content to an init() method.
+
 
 Legend:
 --------------------------------------------------------------------------------

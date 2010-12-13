@@ -1,42 +1,91 @@
+/**
+ * Simple User Manager
+ *
+ * A backend to manage users. This is more like a frame work. The UI aspect is
+ * handled by javascript.
+ *
+ * @package		SimpleUserManager
+ * @version		0.1
+ * @author		Juan "JayCreations" Hernandez
+ * @license		MIT
+ * @copyright		2010 Juan J. Hernandez
+ * @link		https://github.com/JayCreations/SimpleUserManager
+ */
+
 function JAuth(oOptions)
 {
 	this.opt = typeof oOptions == 'undefined' ? {} : oOptions;
 	this.iCurrentUserId = -1;
-	this.oStudents = [
+	this.oStudents = [];/*[
 		{
 			username: 'jhernandez',
 			password: 'Pass1234',
 			first_name: 'Juan',
 			last_name: 'Hernandez',
-			stu_class: 'CST 2309',
-			group: 'admin'
+			course: 'CST 2309',
+			role: 'admin'
 		},
 		{
 			username: 'jayh',
 			password: 'Test1111',
 			first_name: 'Jay',
 			last_name: 'Hernandez',
-			stu_class: 'CST 2309',
-			group: 'mod'
+			course: 'CST 2309',
+			role: 'mod'
 		},
 		{
 			username: 'test',
 			password: '1234',
 			first_name: 'Juan',
 			last_name: 'Test',
-			stu_class: 'CST 2309',
-			group: 'user'
+			course: 'CST 2309',
+			role: 'user'
 		}
-	];
+	];*/
+
+	this.oRoles = {
+		admin: 'Administrator',
+		mod: 'Moderator',
+		user: 'Regular User'
+	};
+
+	this.oUser = {};
 }
 
 /**
  * User management.
  */
+JAuth.prototype.setUser = function(oUserInfo)
+{
+	this.oUser = oUserInfo;
+}
+
+JAuth.prototype.setUsers = function(oUsersInfo)
+{
+	this.oStudents = oUsersInfo;
+}
+
 JAuth.prototype.getUser = function(sUsername)
 {
 	var user = -1;
-	for (var i = 0; i < this.oStudents.length; i++)
+
+	// Get the logged in user.
+	user = this.ajaxSend(this.opt.sManagerAction + 'getuser', {username: sUsername}, function(userResponse)
+	{
+		var oUserInfo = eval('(' + userResponse + ')');
+
+		if (oUserInfo != false)
+		{
+			// Set the user info.
+			this.setUser(oUserInfo);
+			this.iCurrentUserId = oUserInfo
+		}
+
+		// Set the user.
+		user = oUserInfo;
+	});
+//console.log(user);
+	/*for (var i = 0; i < this.oStudents.length; i++)
 	{
 		if (this.oStudents[i].username.toLowerCase() == sUsername.toLowerCase())
 		{
@@ -50,7 +99,7 @@ JAuth.prototype.getUser = function(sUsername)
 		}
 	}
 
-	return user;
+	return user;*/
 }
 
 JAuth.prototype.getUserIdByUsername = function(sUsername)
@@ -58,6 +107,8 @@ JAuth.prototype.getUserIdByUsername = function(sUsername)
 	for (var i = 0; i < this.oStudents.length; i++)
 		if (this.oStudents[i].username.toLowerCase() == sUsername.toLowerCase())
 			return i;
+
+	return false;
 }
 
 JAuth.prototype.getUserById = function(iId)
@@ -70,20 +121,33 @@ JAuth.prototype.getUsers = function()
 	return this.oStudents;
 }
 
+JAuth.prototype.getRoles = function()
+{
+	return this.oRoles;
+}
+
 JAuth.prototype.validateUser = function(oParams)
 {
 	// We need the username and password first.
 	if (oParams.username == '' || oParams.password == '')
 		return false;
 
-	// Get/Find the user with that username.
-	var user = this.getUser(oParams.username);
+	// Lets log in.
+	var loggedIn = false;
+	var login;
+	this.ajaxSend(this.opt.sManagerAction + 'login', this.serialize(oParams), function(loginResponse)
+	{
+		login = loginResponse;
+	});
 
-	// Did we find the user?
-	if (user != -1 && user.password == oParams.password)
-		return true;
-	else
-		return false;
+	// Get/Find the user with that username.
+	this.sleep(100, function()
+	{
+		loggedIn = login;
+		console.log(loggedIn ? 'true' : 'false');
+	});
+
+	return loggedIn;
 }
 
 JAuth.prototype.checkPassword = function(sPassword)
@@ -116,7 +180,7 @@ JAuth.prototype.updateUser = function(iId, oParams)
 		this.oStudents[iId].password = oParams.password;
 		this.oStudents[iId].first_name = oParams.first_name;
 		this.oStudents[iId].last_name = oParams.last_name;
-		this.oStudents[iId].stu_class = oParams.stu_class;
+		this.oStudents[iId].course = oParams.course;
 		this.oStudents[iId].group = oParams.group;
 
 		return true;
@@ -128,6 +192,7 @@ JAuth.prototype.updateUser = function(iId, oParams)
 JAuth.prototype.logOut = function()
 {
 	this.iCurrentUserId = -1;
+	this.ajaxGet(this.opt.sManagerAction + 'logout', function() { });
 }
 
 /**
@@ -271,4 +336,87 @@ JAuth.prototype.loadScript = function(sSrc)
 JAuth.prototype.getElement = function(sId)
 {
 	return document.getElementById(sId);
+}
+
+/**
+ * Ajax related.
+ */
+// IE we !love you.
+if (typeof XMLHttpRequest == 'undefined')
+{
+	window.XMLHttpRequest = function()
+	{
+		return new ActiveXObject(navigator.userAgent.indexOf('MSIE 5') >= 0 ? 'Microsoft.XMLHTTP' : 'Msxml2.XMLHTTP');
+	}
+}
+
+JAuth.prototype.ajaxGet = function(sUrl, funcCallback)
+{
+	if (!window.XMLHttpRequest)
+		return false;
+
+	var oDoc = new XMLHttpRequest();
+
+	// Go.
+	oDoc.onreadystatechange = function()
+	{
+		// Are we ready?
+		if (oDoc.readyState != 4)
+			return;
+
+		if (oDoc.responseText != null && oDoc.status == 200)
+		{
+			// Call the method
+			funcCallback.call(this, oDoc.responseText);
+		}
+	}
+
+	oDoc.open('GET', sUrl, true);
+	oDoc.send(null);
+
+	return oDoc;
+}
+
+JAuth.prototype.ajaxSend = function(sUrl, sContent, funcCallback)
+{
+	if (!window.XMLHttpRequest)
+		return false;
+
+	var sendDoc = new XMLHttpRequest();
+
+	// Go.
+	sendDoc.onreadystatechange = function()
+	{
+		if (sendDoc.readyState != 4)
+			return;
+
+		if (sendDoc.responseText != null && sendDoc.status == 200)
+		{
+			// Call the method
+			funcCallback.call(this, sendDoc.responseText);
+		}
+	}
+	sendDoc.open('POST', sUrl, true);
+	if (typeof(sendDoc.setRequestHeader) != 'undefined')
+		sendDoc.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	sendDoc.send(sContent);
+
+	return true;
+}
+
+/**
+ * Serialize method taken from Pro JavaScript Techniques by John Resig.
+ */
+JAuth.prototype.serialize = function(a)
+{
+	var s = [];
+
+	if (a.constructor == Array)
+		for (var i = 0; i < a.length; i++)
+			s.push(a[i].name + '=' + encodeURIComponent(a[i].value));
+	else
+		for (var j in a)
+			s.push(j + '=' + encodeURIComponent(a[j]));
+
+	return s.join('&');
 }
